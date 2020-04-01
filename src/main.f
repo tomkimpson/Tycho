@@ -32,7 +32,7 @@ print *, 'Convert_s =', convert_s
 
 
 !Run A
-h = 10.0_dp
+h = 1000.0_dp
 FileID = 'A'
 p0 = 1e-3
 lambda=1.0_dp
@@ -69,6 +69,7 @@ call setup()
 
 !Calculate the initial E,L,Q from the Keplerian orbital parameters
 r_init = semi_major
+r_init = rp
 
 if (eccentricity .EQ. 0.0_dp) then
 

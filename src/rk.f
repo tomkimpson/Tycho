@@ -25,13 +25,14 @@ real(kind=dp),intent(IN),dimension(entries) :: y0 !initial conditions
 !Other
 real(kind=dp), dimension(size(y0)) :: y, y1,dy !Some useful vectors used during integration
 real(kind=dp), dimension(nrows,ncols) :: AllData !Big array to save all data. 12 coordinates + tau +
-real(kind=dp), dimension(:,:),allocatable :: output !smaller array which will be outout
+real(kind=dp), dimension(nrows,4) :: AllDerivs !Big array to save all data. 12 coordinates + tau +
+real(kind=dp), dimension(:,:),allocatable :: output, outputDerivs !smaller array which will be outout
 integer(kind=dp) :: i,j,NSteps !,nsteps !index for saving to array
 
 
-real(kind=dp) :: tau
+real(kind=dp) :: tau, ur
 real(kind=dp) :: mm, xC, yC, zC !Cartesian components
-
+real(kind=dp) :: EinsteinDelay, ri, ti, EinsteinDelay1
 
 
 !Set the integration tolerance
@@ -51,6 +52,9 @@ i = 1
 AllData(i,1:12) = y
 AllData(i,13) = tau !tau
 
+!Get some derivative info
+call derivs(y,dy)
+AllDerivs(i,1:4) = dy(1:4)
 
 !Integrate
 do while ( y(1) .LT. time_cutoff )
@@ -63,7 +67,7 @@ do while ( y(1) .LT. time_cutoff )
 
 
     !Print statements
-!    print *, y(1)/ time_cutoff, h, y(2), i
+ !   print *, y(1)/ time_cutoff, h, y(2), i
 
 
    
@@ -74,6 +78,8 @@ do while ( y(1) .LT. time_cutoff )
     AllData(i,13) = tau
 
 
+    call derivs(y,dy)
+    AllDerivs(i,1:4) = dy(1:4)
 
 
 enddo
@@ -98,6 +104,8 @@ print *, 'Runge Kutta completed. Start data I/O'
 allocate(output(NSteps,ncols))
 output = AllData(1:i, :)
 
+allocate(outputDerivs(NSteps,4))
+outputDerivs = AllDerivs(1:i, :)
 
 
 
@@ -122,7 +130,26 @@ print *, 'savefile2'
 !Savefile 2
 open(unit=30,file=savefile2,status='replace',form='formatted')
 do j=1,i
-write(30,*) output(j,1)
+
+ti = output(j,1)
+ri = output(j,2)
+tau = output(j,13)
+ur = AllDerivs(j,2)
+call PostKeplerianDelays(ri, ti,ur, EinsteinDelay,EinsteinDelay1)
+
+
+
+
+!write(30,*) ti/(convert_s*3600.0_dp*24.0_dp*365.0_dp), EinsteinDelay,(ti-tau)/convert_s, (1.0_dp - ri/semi_major)/eccentricity
+
+
+!write(30,*) ti/PeriodEst, ri
+
+
+write(30,*) ti/PeriodEst, EinsteinDelay, ti-tau, ri
+
+
+
 enddo
 close(30)
 

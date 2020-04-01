@@ -24,8 +24,9 @@ real(kind=dp), parameter :: convert_spin= light_c/(Newton_g*(MBH*Msolar)**2.0_dp
 real(kind=dp), parameter :: semi_latus = semi_major *(1.0_dp-eccentricity**2.0_dp)
 real(kind=dp), parameter :: ra = semi_latus/(1.0_dp - eccentricity) 
 real(kind=dp), parameter :: rp = semi_latus/(1.0_dp + eccentricity) 
-
-
+real(kind=dp), parameter :: cosE0 = (1.0_dp - rp/semi_major) / eccentricity !Starts at periapsis
+real(kind=dp), parameter :: sinE0 = sqrt(1.0_dp - cosE0**2)
+real(kind=dp), parameter :: gam = 2.0_dp*eccentricity*sqrt(semi_major)
 
 
 
