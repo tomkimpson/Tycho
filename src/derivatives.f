@@ -3,7 +3,6 @@ module derivatives
 use parameters
 use constants
 use tensors
-use quadrupole_expressions 
 
 implicit none
 
@@ -25,29 +24,31 @@ real(kind=dp), intent(OUT), dimension(entries) :: dy !deriatives
 real(kind=dp), dimension(4,4) :: metric,metricCONTRA !covariant and contravariant metric components
 real(kind=dp), dimension(4) ::  SVector, PVector,perts
 real(kind=dp), dimension(4) :: Xprime, Sprime, Pprime !derivative vectors
-
+real(kind=dp) :: r_i, theta_i
 !Read in the data
 PVector = y(5:8)
 SVector = y(9:12)
 
+r_i = y(2)
+theta_i = y(3)
 
 
 
 
 !Calculate the metric components
-call calculate_covariant_metric(y(2), y(3), metric)
-call calculate_contravariant_metric(metric, metricCONTRA)
+call calculate_covariant_metric(r_i, theta_i, metric)
+call calculate_contravariant_metric(r_i,theta_i, metricCONTRA)
 
 
 
 !Calculate Christoffel symbols - these are saved globally
-call ChristoffelQuad(y(2),y(3)) 
+call calculate_christoffel(r_i,theta_i) 
 !Calculate Riemann tensor - components are saved globally
-call RiemannQuad(y(2), y(3))
-!Calculate components of antisymmetric spin tensor - cpts saved globally
+call calculate_riemann(r_i, theta_i)
 
-call calculate_spintensor(y(2), y(3), &
-                            SVector, PVector, metricCONTRA)
+!Calculate components of antisymmetric spin tensor - cpts saved globally
+call calculate_spintensor(r_i, theta_i, &
+                          SVector, PVector, metricCONTRA)
 
 !Calculate 4-velocity
 call calculate_FourVelocity(PVector, metric,Xprime)

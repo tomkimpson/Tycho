@@ -2,7 +2,7 @@ from os import system as os
 import sys
 
 #Clear data directory
-os('rm /Users/tomkimpson/Data/Quadrupole/*.txt')
+#os('rm /Users/tomkimpson/Data/Quadrupole/*.txt')
 
 
 #Specify compilation settings
@@ -12,7 +12,6 @@ settings = ' -ffree-form -ffree-line-length-0 -fdefault-real-8 -O3 -Wunused-labe
 #Can comment out QuadExpressions compilation when its been done once
 os("gfortran -J mod/ -c"+settings+"parameters.f -o mod/1.o") 
 os("gfortran -J mod/ -c"+settings+"constants.f -o mod/2.o") 
-#os("gfortran -J mod/ -c"+settings+"QuadExpressions.f -o mod/3.o") 
 os("gfortran -J mod/ -c"+settings+"tensors.f -o mod/4.o") 
 os("gfortran -J mod/ -c"+settings+"derivatives.f -o mod/5.o") 
 os("gfortran -J mod/ -c"+settings+"initial_conditions.f -o mod/6.o") 

@@ -5,46 +5,6 @@ program main
 use parameters
 use constants
 implicit none
-integer(kind=dp) :: NumRuns, i, j, k
-real(kind=dp) :: roemer_difference
-real(kind=dp), dimension(:,:), allocatable :: output_array
-real(kind=dp) :: maxP, minP
-real(kind=dp), dimension(3) :: e_array, a_array
-real(kind=dp), dimension(:), allocatable :: EinsteinDifference
-
-
-!Set the observer
-ObsTheta = PI/4.0_dp
-ObsPhi = 0.0_dp
-ObsX = sin(ObsTheta)*cos(ObsPhi)
-ObsY = sin(ObsTheta)*sin(ObsPhi)
-ObsZ = cos(ObsTheta)
-
-
-!Each iteration with these initial conditions will produce the following:
-
-!A quasi kerr ST with spin couplings (A)
-
-!A quasi kerr ST without spin couplings (B)
-
-!A kerr spacetime with spin couplings (C)
-
-!We can then compare A vs. B and A vs. C
-
-!A vs B = delta lambda A vs. C = delta epsilon
-
-
-!Set the initial stepsize 
-h = 5.00_dp 
-
-
-
-!Galactic Centre
-!h = 80.0_dp !for GC, r = 830
-!h = 50.0_dp !for GC, r=520
-h = 15.0_dp !for GC, r=178
-!h=10.0_dp
-h = 1.0_dp
 
 
 
@@ -61,16 +21,6 @@ print *, 'Estimated Orbital Period = ', PeriodEst/(convert_s*3600.0_dp * 24.0_dp
 print *, 'Convert_s =', convert_s
 
 
-
-!-------testing
-
-!Run A
-!FileID = 'A'
-!p0 = 1e-3
-!lambda=0.0_dp
-!epsQ = 0.100_dp
-!s0 = convert_spin*2.0_dp*PI*inertia/p0
-!call run()
 !stop
 
 
@@ -82,33 +32,12 @@ print *, 'Convert_s =', convert_s
 
 
 !Run A
+h = 10.0_dp
 FileID = 'A'
 p0 = 1e-3
 lambda=1.0_dp
-epsQ = 0.01000_dp
-s0 = convert_spin*2.0_dp*PI*inertia/p0
-
-call run()
-
-!Run B
-FileID = 'B'
-p0 = 1e10 !Some very slow spinner
-lambda=0.0_dp
-epsQ = 0.01000_dp
 s0 = convert_spin*2.0_dp*PI*inertia/p0
 call run()
-
-
-
-!Run C
-FileID = 'C'
-p0 = 1e-3 
-lambda=1.0_dp
-epsQ = 0.00_dp
-s0 = convert_spin*2.0_dp*PI*inertia/p0
-call run()
-
-
 
 print *, 'Completed OK'
 

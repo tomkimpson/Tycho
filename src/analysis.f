@@ -31,7 +31,7 @@ real(kind=dp), dimension(4,4) :: transformation_matrix_inverse,transformation_ma
 
 !Calculate the metric components
 call calculate_covariant_metric(x(2), x(3), metric)
-call calculate_contravariant_metric(metric, metricCONTRA)
+call calculate_contravariant_metric(x(2),x(3), metricCONTRA)
 
 
 !Transform the contravariant components of the MSP 4-velocity

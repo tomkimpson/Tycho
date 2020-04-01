@@ -66,6 +66,7 @@ real(kind=dp), parameter :: inertia = 0.40_dp*(MPSR*Msolar)*(RPSR*1.0d3)**2.0_dp
 real(kind=dp) :: s0  !=  convert_spin*2.0_dp*PI*inertia/p0 !magnitude of spin spatial vector in natural units
 !real(kind=dp), parameter :: s0 = 0.0_dp !convert_spin*2.0_dp*PI*inertia/p0 !magnitude of spin spatial vector in natural units
 
+real(kind=dp), parameter :: time_cutoff = 2.0_dp*PI*semi_major**(3.0_dp/2.0_dp) * N_orbit
 
 real(kind=dp), parameter :: m0 = MPSR/MBH !Mass ratio
 integer(kind=dp), parameter :: entries = 12 !Number of differetnai eqns 4x(position,spin,momentum)
@@ -73,13 +74,14 @@ real(kind=dp), parameter :: FinalPhi = 2.0_dp*PI*N_orbit !The final phi after al
 
 !Integration constants
 real(kind=dp) :: h !=1.0d-1 !Initial stepsize. This will be varied by RKF so it is not a parameter 
-real(kind=dp), parameter :: escal = 1.0d19
+!real(kind=dp), parameter :: escal = 1.0d19
+real(kind=dp) :: escal 
 real(kind=dp), parameter :: S = 0.90_dp
 real(kind=dp), parameter :: Pgrow = -0.20_dp
 real(kind=dp), parameter :: Pshrink = -0.250_dp
 real(kind=dp), parameter :: errcon = (5.0_dp/S)**(1.0_dp/Pgrow)
 integer(kind=dp), parameter :: nrows = 1d6 
-
+integer(kind=dp) :: ncols = entries + 1 !12 coordinates + tau
 
 
 !Savefiles
@@ -87,6 +89,7 @@ character(len=200) :: PathOut,BinaryData, PlotData,Fname,RoemerData !Decalared l
 real(kind=dp), parameter :: coarse = 1.0_dp !how much of total data is saved to formatted file 1 = lots, +infty = none
 
 character(len=200) :: TimeFile, SpinFile, FileID, RoemerFile, EinsteinFile
+character(len=200) :: dir, savefile1, savefile2
 
 
 

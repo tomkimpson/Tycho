@@ -38,48 +38,13 @@ print *, 'Eccentricity = ', eccentricity
 
 
 
+savefile1 = trim(adjustl(IO_path))//'trajectory.txt'
+savefile2 = trim(adjustl(IO_path))//'PK.txt'
 
 
-!Declare savefiles
-write(LamStr,'(F10.2)') lambda
-write(QStr,'(F10.2)') epsQ
-write(EStr,'(F10.2)') eccentricity
-write(AStr,'(F10.2)') a
+print *, savefile1
+print *, savefile2
 
-call get_environment_variable("QuadDir", PathOut)
-
-Fname = 'data_eps='//trim(adjustl(QStr))//'lambda='//trim(adjustl(LamStr))
-
-
-!Fname = 'data_lambda='//trim(adjustl(LamStr))//'_epsQ='//trim(adjustl(Qstr))//'_ecc='//trim(adjustl(EStr))//'_a='//trim(adjustl(AStr))
-BinaryData = trim(adjustl(PathOut))//&
-             trim(adjustl(Fname))//&
-             '.dat'
-
-PlotData = trim(adjustl(PathOut))//&
-             trim(adjustl(Fname))//&
-             '.txt'
-
-
-TimeFile = trim(adjustl(PathOut))//&
-           'V2/TimeEvolution/'//&
-           trim(adjustl(Fname))//'.txt'
-
-
-
-SpinFile = trim(adjustl(PathOut))//&
-           'V2/SpinEvolution/'//&
-           trim(adjustl(FileID))//'.txt'
-
-
-RoemerFile = trim(adjustl(PathOut))//&
-           'V2/Roemer/'//&
-           trim(adjustl(FileID))//'.txt'
-
-
-EinsteinFile = trim(adjustl(PathOut))//&
-           'V2/Einstein/'//&
-           trim(adjustl(FileID))//'.txt'
 
 end subroutine setup
 
