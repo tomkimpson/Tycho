@@ -68,6 +68,11 @@ dy(5:8) = Pprime
 dy(9:12) = Sprime
 
 
+!print *, Xprime
+!print *, Pprime
+!print *, Sprime
+!stop
+
 
 end subroutine derivs
 

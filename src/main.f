@@ -4,42 +4,35 @@ program main
 
 use parameters
 use constants
+use IC
 implicit none
 
 
 
-PeriodEst = 2.0_dp * PI * semi_major**(3.0_dp / 2.0_dp) 
 
 
 
-print *, 'Estimated Orbital Period = ', PeriodEst/convert_s, ' seconds'
-print *, 'Estimated Orbital Period = ', PeriodEst/(convert_s*3600.0_dp * 24.0_dp), ' days'
-print *, 'Estimated Orbital Period = ', PeriodEst/(convert_s*3600.0_dp * 24.0_dp*365.0_dp), ' years'
+!Set the stepsize
+h = 50.0_dp
 
-
-
-print *, 'Convert_s =', convert_s
-
-
-!stop
-
-
-
-
-
-
-
-
-
-!Run A
-h = 1000.0_dp
-FileID = 'A'
-p0 = 1e-3
-lambda=1.0_dp
-s0 = convert_spin*2.0_dp*PI*inertia/p0
+mode = 'SCH'
+call update_class()
 call run()
 
-print *, 'Completed OK'
+
+mode = 'KER'
+call update_class()
+call run()
+
+
+mode = 'MPD'
+call update_class()
+call run()
+
+
+
+
+print *, 'Finished'
 
 
 
@@ -107,10 +100,18 @@ Y_init(4) = phi_init
 Y_init(5:8) = PVector
 Y_init(9:12) = SVector
 
+if (print_status .EQ. 1) then
+print *, Y_init(1:4)
+print *, Pvector
+print *, Svector
+print *, a
+print *, lambda
+endif
 
 
 print *, 'start RK'
 call rk(Y_init)
+print *, 'Completed RK'
 
 
 end subroutine run

@@ -8,11 +8,47 @@ use tensors
 
 implicit none
 
-private function_f, function_g, function_h, function_d, checks, function_f3, function_h3
+private function_f, function_g, function_h, function_d, checks
 
-public calculate_EQL, calculate_IC, calculate_EQL_circular, setup
+public calculate_EQL, calculate_IC, calculate_EQL_circular, setup, update_class
 
 contains 
+
+
+
+
+subroutine update_class()
+!Arguments
+!character(len=3) :: mode
+
+
+
+if (mode .EQ. 'MPD') then
+
+print *, mode, ' mode' 
+a = a_fixed
+p0 = 1e-3
+lambda=1.0_dp
+s0 = convert_spin*2.0_dp*PI*inertia/p0
+
+
+else if (mode .EQ. 'KER') then
+print *, mode, ' mode' 
+a = a_fixed
+lambda = 0.0_dp
+s0 = 0.0_dp
+
+
+else if (mode .EQ. 'SCH') then
+a = 0.0_dp
+lambda = 0.0_dp
+s0=0.0_dp
+
+
+endif
+
+
+end subroutine update_class
 
 
 subroutine setup()
@@ -34,14 +70,14 @@ endif
 
 print *, 'SMA = ', semi_major
 print *, 'Eccentricity = ', eccentricity
+print *, 'Estimated Orbital Period = ', PeriodEst/(convert_s*3600.0_dp * 24.0_dp*365.0_dp), ' years'
 
 
+savefile1 = trim(adjustl(IO_path))//'trajectory_'//mode//'.txt'
+savefile2 = trim(adjustl(IO_path))//'TimeDelay_'//mode//'.txt'
+savefile3 = trim(adjustl(IO_path))//'TimeDelay_PK.txt' !Only used for mode = 'SCH'
 
-
-savefile1 = trim(adjustl(IO_path))//'trajectory.txt'
-savefile2 = trim(adjustl(IO_path))//'PK.txt'
-
-
+print *, 'Outfiles:'
 print *, savefile1
 print *, savefile2
 
@@ -52,7 +88,7 @@ end subroutine setup
 SUBROUTINE checks(RR,TT)
 real(kind = dp) :: RR, TT
 
-if (RR .LT. 0 .and. abs(RR) < 1d-16) then
+if (RR .LT. 0 .and. abs(RR) < precision_limit) then
 print *, ' RR is negative but small. Correction applied :', RR, 0.00_dp
 RR = 0.00_dp
 else if (RR .LT. 0 .and. abs(RR) > 1d-16) then
@@ -61,7 +97,7 @@ STOP
 endif
 
 
-if (TT .LT. 0 .and. abs(TT) < 1d-16) then
+if (TT .LT. 0 .and. abs(TT) < precision_limit) then
 print *, ' TT is negative but small. Correction applied :', TT, 0.00_dp
 TT = 0.00_dp
 else if (TT .LT. 0 .and. abs(TT) > 1d-16) then
@@ -86,50 +122,42 @@ real(kind=dp) :: r, theta, phi !initial location of particle
 real(kind=dp) :: sigma, delta,PP,RR,TT !Some useful functions
 real(kind=dp) :: tdot, rdot, thetadot, phidot !Kerr differential equations
 real(kind=dp), dimension(4,4) :: metric
-real(kind=dp) :: f3, h3, ur,ut,uphi,utheta
+real(kind=dp) :: f3, h3, ur2,ut,uphi,utheta2
 
-
+!Load the variables
 r = r_init
 theta = theta_init
 phi = phi_init
 
+!Define some useful stuff
 sigma = r**2.0_dp +a**2 * cos(theta)
 delta = r**2.0_dp +a**2 - 2.0_dp*r
 
 
-call function_f3(r,f3)
-call function_h3(r,h3)
 
+!Calculate the initial 4 velocity
 PP = E* (r**2.0_dp + a**2) - a*L
 
 
 
-ut = ((r**2+a**2)*PP/delta -a*(a*E-L))/r**2.0_dp - epsQ*(1.0_dp - 2.0_dp/r)**(-1.0_dp) * f3*E
 
-ur = (PP**2.0_dp - delta*(r**2.0_dp + (L - a*E)**2.0_dp) - epsQ*r**4.0_dp * (1.0_dp -2.0_dp/r)*((f3-h3)*L**2.0_dp/r**2.0_dp + f3) )&
-/r**4.0_dp
-
-utheta = 0.0_dp
-
-
-uphi = (a*PP/delta -a*E + L)/r**2.0_dp - epsQ*h3*L/r**2.0_dp
-
-
-call checks(RR,TT)
-
-
-if (ur .LT. 0.0_dp .and. abs(ur) .LT. 1e-33) then
-ur = 0.0_dp
-endif
-!fixing float bug? check this
+ut = ((r**2+a**2)*PP/delta -a*(a*E-L))/sigma
+ur2 = (PP**2.0_dp - delta*(r**2.0_dp + (L - a*E)**2.0_dp) )/sigma**2.0_dp
+utheta2 = (Q - cos(theta)**2.0_dp*(a**2.0_dp * (1.0_dp - E**2.0_dp)+L**2.0_dp/sin(theta)**2.0_dp) ) / sigma**2
+uphi = (a*PP/delta -a*E + L/sin(theta)**2)/sigma
 
 
 
 
+call checks(ur2,utheta2)
 
+
+
+
+!Convert to a momentum
 PVector(1) = m0 * ut
-PVector(2) = - m0*sqrt(ur)  !made this negative
-PVector(3) = 0.0_dp
+PVector(2) = - m0*sqrt(ur2)  !made this negative
+PVector(3) = m0*sqrt(utheta2)
 PVector(4) = m0*uphi
 
 
@@ -144,8 +172,6 @@ call calculate_covariant_metric(r,theta,metric)
 
 
 !Now calculate some extras using the covariant metric
-
-
 
 
 
@@ -283,10 +309,6 @@ integer(kind=dp) :: pow
 
 
 
-if (iota .NE. 0.0_dp) then
-print *, 'Error! Quadrupole orbital parameter mapping is only defined for equatorial plane'
-stop
-endif
 
 delta = r**2 - 2.0_dp*r + a**2
 f = r**4 + a**2 * (r*(r+2.0_dp))
@@ -306,13 +328,7 @@ real(kind=dp) :: r,h
 real(kind=dp) :: f3,h3
 
 
-
-
-call function_f3(r,f3)
-call function_h3(r,h3)
-
-
-h = r*(r-2.0_dp) -epsQ *(2.0_dp*f3*r - 2.0_dp*h3*r - f3*r**2 + h3*r**2)
+h = r*(r-2.0_dp) 
 
 end subroutine function_h
 
@@ -325,51 +341,26 @@ real(kind=dp) :: delta, f3
 
 delta = r**2.0_dp - 2.0_dp*r + a**2
 
-
-call function_f3(r,f3)
-
-d = (r**2.0_dp)*delta - epsQ*(2.0_dp*f3*r**3 - f3*r**4)
+d = (r**2.0_dp)*delta 
 
 end subroutine function_d
 
 
 
 
-subroutine function_f3(r,f3)
-real(kind=dp) :: r,f3
-real(kind=dp) :: F2,A1, F2_upper, F2_lower
-
-F2_upper = -5.0_dp*(r-1.0_dp)*(2.0_dp + 6.0_dp*r - 3.0_dp*r**2)
-F2_lower = 8.0_dp*r*(r-2.0_dp)
-F2 = F2_upper/ F2_lower
-
-A1= 15.0_dp*r*(r-2.0_dp)*log(r/(r-2.0_dp)) / 16.0_dp
-
-
-f3 = F2 - A1
-
-
-end subroutine function_f3
 
 
 
 
 
-subroutine function_h3(r,h3)
-real(kind=dp) :: r,h3
-real(kind=dp) :: H2,A2
 
 
 
-H2 = 5.0_dp*(2.0_dp -3.0_dp*r - 3.0_dp*r**2)/(8.0_dp*r)
-
-A2 = -15.0_dp*(r**2 - 2.0_dp)*log(r/(r-2.0_dp))/16.0_dp
 
 
-h3 = H2 - A2
 
 
-end subroutine function_h3
+
 
 
 

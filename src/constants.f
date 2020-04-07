@@ -27,7 +27,7 @@ real(kind=dp), parameter :: rp = semi_latus/(1.0_dp + eccentricity)
 real(kind=dp), parameter :: cosE0 = (1.0_dp - rp/semi_major) / eccentricity !Starts at periapsis
 real(kind=dp), parameter :: sinE0 = sqrt(1.0_dp - cosE0**2)
 real(kind=dp), parameter :: gam = 2.0_dp*eccentricity*sqrt(semi_major)
-
+real(kind=dp), parameter :: PeriodEst = 2.0_dp * PI * semi_major**(3.0_dp / 2.0_dp) 
 
 
 
@@ -35,8 +35,9 @@ real(kind=dp), parameter :: gam = 2.0_dp*eccentricity*sqrt(semi_major)
 real(kind=dp) :: ObsTheta, ObsPhi, ObsX, ObsY, ObsZ  !Observer location
 real(kind=dp) :: epsQ !BH quadrupole moment
 real(kind=dp) :: lambda !Turn on/off spin-curvature coupling (1 = on)
-real(kind=dp) :: p0, PeriodEst
-
+real(kind=dp) :: p0, a
+real(kind=dp), parameter :: precision_limit = 10**(-(dp*2.0_dp-1.0_dp))
+character(len=3) :: mode
 
 !Convert some stuff from parameters to a more usable form (c.f. units)
 !Physical constants
@@ -90,7 +91,7 @@ character(len=200) :: PathOut,BinaryData, PlotData,Fname,RoemerData !Decalared l
 real(kind=dp), parameter :: coarse = 1.0_dp !how much of total data is saved to formatted file 1 = lots, +infty = none
 
 character(len=200) :: TimeFile, SpinFile, FileID, RoemerFile, EinsteinFile
-character(len=200) :: dir, savefile1, savefile2
+character(len=200) :: dir, savefile1, savefile2,savefile3
 
 
 

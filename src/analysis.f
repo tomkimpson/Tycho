@@ -16,7 +16,7 @@ contains
 
 
 subroutine PostKeplerianDelays(r,t,ur,&
-                               delta_E,delta_E1)
+                               delta_E)
 !Arguments
 real(kind=dp) :: r,t,delta_E,delta_E1,ur
 
@@ -26,26 +26,15 @@ real(kind=dp) :: cosE, sinE
 real(kind=dp) :: gBAR, pBAR, aBAR, tBAR
 
 
-
+!Calculate the eccentric anomaly
 cosE = (1.0_dp - r/semi_major)/eccentricity
-
 sinE = sign(sqrt(1.0_dp -cosE**2),ur)
 
 
 
-
+!And get the Einstein delay.
+!Assumes r0 = rp
 delta_E = gam * (sinE) +1.50_dp * t / semi_major
-delta_E1 = gam * (-sinE) +1.50_dp * t / semi_major
-
-
-!aBAR = semi_major /convert_m
-!tBAR = t / convert_s
-
-!pBAR = 2*PI*aBAR**(1.50) * (Newton_g *MBH*Msolar)**(-0.5)
-!gBAR = Newton_g * MBH*Msolar*pBAR*eccentricity / (PI*aBAR*light_c**2)
-
-!delta_E = gBAR*(sinE - sinE0) + 3.0_dp/2.0_dp * (Newton_g*MBH*Msolar) * tBAR / (aBAR*light_c**2)
-!delta_E = + 3.0_dp/2.0_dp * (Newton_g*MBH*Msolar) * tBAR / (aBAR*light_c**2)
 
 
 end subroutine PostKeplerianDelays

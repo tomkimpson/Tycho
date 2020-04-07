@@ -24,10 +24,10 @@ os("gfortran -J mod/ -c"+settings+"main.f -o mod/9.o")
 #Link all modules
 print ('Starting compilation')
 os("gfortran mod/*.o -o GO")
+print ('Compiled.') 
 
 
 #Run the code
-print ('Compiled. Now running the code')
 os("./GO")
 
 

@@ -32,7 +32,7 @@ integer(kind=dp) :: i,j,NSteps !,nsteps !index for saving to array
 
 real(kind=dp) :: tau, ur
 real(kind=dp) :: mm, xC, yC, zC !Cartesian components
-real(kind=dp) :: EinsteinDelay, ri, ti, EinsteinDelay1
+real(kind=dp) :: EinsteinDelay_PK,EinsteinDelay_GR, ri, ti
 
 
 !Set the integration tolerance
@@ -64,11 +64,10 @@ do while ( y(1) .LT. time_cutoff )
     call RKF(y,y1)
     y = y1
  
-
-
     !Print statements
- !   print *, y(1)/ time_cutoff, h, y(2), i
-
+    if (print_status .EQ. 1) then
+        print *, y(1)/ time_cutoff, h, y(2), i
+    endif
 
    
     !Save the output
@@ -108,9 +107,7 @@ allocate(outputDerivs(NSteps,4))
 outputDerivs = AllDerivs(1:i, :)
 
 
-
-print *, 'savefile1'
-!Savefile 1
+!Save the spatial trajectory
 open(unit=30,file=savefile1,status='replace',form='formatted')
 do j=1,NSteps
 
@@ -126,38 +123,42 @@ enddo
 close(30)
 
 
-print *, 'savefile2'
-!Savefile 2
+
+
+!Save the time delays
+
+
+
 open(unit=30,file=savefile2,status='replace',form='formatted')
+
+if (mode .EQ. 'SCH') then
+open(unit=40,file=savefile3,status='replace',form='formatted')
+endif
+
+
 do j=1,i
-
-ti = output(j,1)
-ri = output(j,2)
-tau = output(j,13)
-ur = AllDerivs(j,2)
-call PostKeplerianDelays(ri, ti,ur, EinsteinDelay,EinsteinDelay1)
+    ti = output(j,1)
+    ri = output(j,2)
+    tau = output(j,13)
+    ur = AllDerivs(j,2)
 
 
+    EinsteinDelay_GR = ti-tau
+    write(30,*) tau/convert_s, EinsteinDelay_GR/convert_s
 
 
-!write(30,*) ti/(convert_s*3600.0_dp*24.0_dp*365.0_dp), EinsteinDelay,(ti-tau)/convert_s, (1.0_dp - ri/semi_major)/eccentricity
-
-
-!write(30,*) ti/PeriodEst, ri
-
-
-write(30,*) ti/PeriodEst, EinsteinDelay, ti-tau, ri
+    if (mode .EQ. 'SCH') then
+    call PostKeplerianDelays(ri, ti,ur, EinsteinDelay_PK)
+    write(40,*) tau/convert_s, EinsteinDelay_PK/convert_s
+    endif
 
 
 
 enddo
 close(30)
-
-
-    
-
-
-
+if (mode .EQ. 'SCH') then
+close(40)
+endif
 
 
 

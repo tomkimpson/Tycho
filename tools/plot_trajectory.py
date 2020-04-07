@@ -27,7 +27,7 @@ elif  (d == 2):
 
 #Load data
 path = '/Users/tomkimpson/Data/Tycho/'
-PlotFile = path + 'trajectory.txt'
+files = glob.glob(path + 'trajectory_*.txt')
 
 
 
@@ -74,8 +74,8 @@ def plot(f):
         ax2.plot(x,z)
 
 
-
-plot(PlotFile)
+for f in files:
+    plot(f)
 
 
 plt.rc('text', usetex=True)
