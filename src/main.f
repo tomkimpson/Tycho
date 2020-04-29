@@ -20,6 +20,8 @@ call update_class()
 call run()
 
 
+print *, 'jere'
+
 mode = 'KER'
 call update_class()
 call run()
@@ -109,12 +111,6 @@ print *, Svector
 print *, a
 print *, lambda
 endif
-
-
-
-
-print *, escal
-stop
 
 
 print *, 'start RK'

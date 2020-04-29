@@ -43,6 +43,9 @@ def process(e,ls):
     F2 = path+e+'TimeDelay_SCH.txt'
     F3 = path+e+'TimeDelay_KER.txt'
     F4 = path+e+'TimeDelay_MPD.txt'
+    
+    print (F1)
+
 
     #get the data
     x1,y1 = get_data(F1)
@@ -52,10 +55,10 @@ def process(e,ls):
 
 
     #plot the Einstein delay
-    ax1.plot(x1,y1/hr)
+    ax1.plot(x1,y1/hr,c='r')
     ax1.plot(x2,y2/hr)
-    ax1.plot(x3,y3/hr)
-    ax1.plot(x4,y4/hr)
+ #   ax1.plot(x3,y3/hr)
+ #   ax1.plot(x4,y4/hr)
 
     #get the differences
     delta_alpha = np.abs(y2 - y1)
@@ -77,6 +80,10 @@ def process(e,ls):
 fs = 20
 
 eccentricities = ['e09/','e08/', 'e07/'] #, 'e07/']
+
+eccentricities = ['../']
+
+
 linestyles = ['solid','dashed', 'dotted']
 counter = 0
 
@@ -106,7 +113,7 @@ ax2.set_xlabel(r'$\tau$ [yr]',fontsize=fs)
 ax2.set_ylim(1e-7)
 
 savepath = '/Users/tomkimpson/Dropbox/MSSL/Papers/Submitted/Paper3_A&A/figures/'
-plt.savefig(savepath+'EinsteinDelay.png', dpi = 300,bbox='tight')
+#plt.savefig(savepath+'EinsteinDelay.png', dpi = 300,bbox='tight')
 plt.show()
 
 
