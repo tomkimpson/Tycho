@@ -16,15 +16,14 @@ contains
 
 
 subroutine PostKeplerianDelays(r,t,ur,&
-                               delta_E)
+                               delta_E,delta_R,delta_S)
 !Arguments
-real(kind=dp) :: r,t,delta_E,delta_E1,ur
+real(kind=dp) :: r,t,delta_E,delta_R,ur,delta_S
 
 !Other
 real(kind=dp) :: cosE, sinE
-
 real(kind=dp) :: gBAR, pBAR, aBAR, tBAR
-
+real(kind=dp) :: alpha, beta
 
 !Calculate the eccentric anomaly
 cosE = (1.0_dp - r/semi_major)/eccentricity
@@ -35,6 +34,19 @@ sinE = sign(sqrt(1.0_dp -cosE**2),ur)
 !And get the Einstein delay.
 !Assumes r0 = rp
 delta_E = gam * (sinE) +1.50_dp * t / semi_major
+
+
+
+!Get the Roemer delay
+!Takes sin(I) = 1
+alpha = semi_major*1.0_dp*sin(phi_init)
+beta = sqrt(1-eccentricity**2) * semi_major*1.0_dp*cos(phi_init)
+
+delta_R = alpha*(cosE - eccentricity) + beta*sinE
+
+
+
+
 
 
 end subroutine PostKeplerianDelays

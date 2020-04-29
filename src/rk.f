@@ -33,7 +33,7 @@ integer(kind=dp) :: i,j,NSteps !,nsteps !index for saving to array
 real(kind=dp) :: tau, ur
 real(kind=dp) :: mm, xC, yC, zC !Cartesian components
 real(kind=dp) :: EinsteinDelay_PK,EinsteinDelay_GR, ri, ti
-
+real(kind=dp) :: RoemerDelay_PK
 
 !Set the integration tolerance
 if (dp .EQ. 8) then
@@ -148,8 +148,8 @@ do j=1,i
 
 
     if (mode .EQ. 'SCH') then
-    call PostKeplerianDelays(ri, ti,ur, EinsteinDelay_PK)
-    write(40,*) tau/convert_s, EinsteinDelay_PK/convert_s
+    call PostKeplerianDelays(ri, ti,ur, EinsteinDelay_PK,RoemerDelay_PK)
+    write(40,*) tau/convert_s, EinsteinDelay_PK/convert_s, RoemerDelay_PK/convert_s
     endif
 
 

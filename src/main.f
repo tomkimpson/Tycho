@@ -84,6 +84,8 @@ SVector(4) = s0*sin(stheta)*sin(sphi)/(r_init*sin(theta_init)) !S3
 
 
 
+
+
 !Calculate the remaining initial conditions
 
 call calculate_IC(E,L,Q, SVector,PVector)
@@ -107,6 +109,12 @@ print *, Svector
 print *, a
 print *, lambda
 endif
+
+
+
+
+print *, escal
+stop
 
 
 print *, 'start RK'
