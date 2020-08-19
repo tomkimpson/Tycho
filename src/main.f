@@ -13,14 +13,11 @@ implicit none
 
 
 !Set the stepsize
-h = 50.0_dp
+h = 5.0_dp
 
 mode = 'SCH'
 call update_class()
 call run()
-
-
-print *, 'jere'
 
 mode = 'KER'
 call update_class()
@@ -63,7 +60,7 @@ real(kind=dp), dimension(entries) :: Y_init !the array of initial conditions to 
 call setup()
 
 !Calculate the initial E,L,Q from the Keplerian orbital parameters
-r_init = semi_major
+!r_init = semi_major
 r_init = rp
 
 if (eccentricity .EQ. 0.0_dp) then

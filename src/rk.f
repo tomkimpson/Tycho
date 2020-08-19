@@ -35,7 +35,7 @@ integer(kind=dp) :: i,j,NSteps !,nsteps !index for saving to array
 
 real(kind=dp) :: tau, ur
 real(kind=dp) :: mm, xC, yC, zC !Cartesian components
-real(kind=dp) :: tPK,EinsteinDelay_PK,EinsteinDelay_GR, ri, ti
+real(kind=dp) :: tPK,EinsteinDelay_PK,EinsteinDelay_GR, ri, ti, RoemerDelay
 real(kind=dp) :: RoemerDelay_PK
 
 !Set the integration tolerance
@@ -140,7 +140,10 @@ do j=1,NSteps
         yC = mm * sin(output(j,3)) * sin(output(j,4))
         zC = mm * cos(output(j,3)) 
 
-write(30,*) output(j,1),xC,yC,zC
+write(30,*) output(j,13),xC,yC,zC
+
+
+
 enddo
 close(30)
 
@@ -166,6 +169,19 @@ do j=1,i
 
 
     EinsteinDelay_GR = ti-tau
+    
+
+
+    mm = sqrt(output(j,2)**2 + a**2)
+    xC = mm * sin(output(j,3)) * cos(output(j,4))
+    yC = mm * sin(output(j,3)) * sin(output(j,4))
+    zC = mm * cos(output(j,3)) 
+
+
+
+
+
+
     write(30,*) tau/convert_s, EinsteinDelay_GR/convert_s
 
 

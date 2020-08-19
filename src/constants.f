@@ -63,7 +63,7 @@ real(kind=dp) :: r_init != rp !initial conditions of particle. Starts at periaps
 
 real(kind=dp), parameter :: theta_min = (90.0_dp - iota) * PI/180.0_dp !Minimum latitude reached in radians
 real(kind=dp), parameter :: theta_init = PI/2.0_dp !initial conditions
-real(kind=dp), parameter :: phi_init = PI/4.0_dp !0.0_dp !initial conditions
+real(kind=dp), parameter :: phi_init = 0.0_dp !0.0_dp !initial conditions
 real(kind=dp), parameter :: t_init = 0.0_dp !initial conditions_
 real(kind=dp), parameter :: zMinus = cos(theta_min)**2.0_dp
 real(kind=dp), parameter :: inertia = 0.40_dp*(MPSR*Msolar)*(RPSR*1.0d3)**2.0_dp !SI units

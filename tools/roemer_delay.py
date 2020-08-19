@@ -6,80 +6,95 @@ import glob
 import matplotlib.gridspec as gridspec
 from mpl_toolkits.mplot3d import Axes3D
 import os
-from scipy.signal import argrelextrema
-from scipy import interpolate
 
 
-#Setup plotting environment
+
+
+
+
+##Setup plotting environment
 plt.style.use('science')
-fig, (ax1,ax2) = plt.subplots(2, 1, sharex=True, figsize=(10,10))
 
+h = 10
+w = 10
 
+fig = plt.figure(figsize=(w,h))
+ax1 = plt.subplot2grid((1,1), (0,0))
 
 #Load data
-path = '/Users/tomkimpson/Data/Tycho/'
-PlotFile = path + 'PK.txt'
-
-hr = 3600
-yr = 3600*24*365
-
-
-def get_data(f):
-
-    data = np.loadtxt(f,skiprows=1)
-    t = data[:,0] / yr
-    roemer = data[:,2] #/ hr
-
-    return t,roemer
+path = '/Users/tomkimpson/Data/Tycho/RoemerDelay/'
 
 
 
+a = 0.6 #spin parameter
 
-def process(ls):
+#Observer Location
+ObsTheta = np.pi/2
+ObsPhi = 0.0
 
-
-    #Define the files
-    F2 = path+'TimeDelay_PK.txt'
-
-    #get the data
-    x2,y2 = get_data(F2)
-
-
-    #plot the roemer delay
-    ax1.plot(x2,y2/hr)
+Ox = np.sin(ObsTheta)*np.cos(ObsPhi)
+Oy = np.sin(ObsTheta)*np.sin(ObsPhi)
+Oz = np.cos(ObsTheta)
 
 
+#some constants
+Msolar = 1.989e30
+c = 3e8
+G=6.67e-11
+MBH=4.31e6*Msolar
+convert_m = c**2/(G*MBH)
+convert_s = convert_m * c
+convert_year = 365*24*3600
 
-#Format
+
+
+
+def plot(f):
+    data = np.loadtxt(f)
+
+    r = data[:,16]
+    theta = data[:,17]
+    phi = data[:,18]
+    tau = data[:,19] #this is in seconds from rk.f of orbital dynamics
+    tau = tau / convert_year    
+
+    #Convert to cartesian
+    m = np.sqrt(r**2 + a**2)
+    x = m*np.sin(theta)*np.cos(phi) / convert_m
+    y = m*np.sin(theta)*np.sin(phi) /convert_m
+    z = r*np.cos(theta) /convert_m
+
+
+    #get the roemer delay
+    roemer = (x*Ox + y*Oy + z*Oz) / c
+    roemer = roemer / (60*60) #hours
+
+    return tau,roemer*1e6
+
+
+eccs = ['e07/','e08/','e09/']
+for e in eccs:
+    f1 = path+e+'kerr.txt'
+    f2 = path+e+'mpd.txt'
+
+    t1,r1 = plot(f1)
+    t2,r2 = plot(f2)
+
+    dr = r2-r1
+    ax1.plot(t1,dr)
+
+
 fs = 20
 
-linestyles = ['solid','dashed', 'dotted']
-counter = 0
 
-ls = linestyles[counter]
-process(ls)
+ax1.locator_params(axis='both', nbins=5) #set number of xticks
+ax1.tick_params(axis='both', which='major', labelsize=fs-4) #set size of numbers
 
-all_axes = plt.gcf().get_axes()
-for ax in all_axes:
-    ax.locator_params(axis='both', nbins=5) #set number of xticks
-    ax.tick_params(axis='both', which='major', labelsize=fs-4) #set size of numbers
-    
-
-plt.setp(ax1.get_xticklabels(),visible=False)
+ax1.set_ylabel(r'$\delta_{\gamma} (\Delta_{\rm R})$ [$\mu$s]',fontsize=fs)
+ax1.set_xlabel(r'$\tau$ [yr]',fontsize=fs)
 
 
-ax2.set_yscale('log')
-plt.subplots_adjust(hspace = 0.01)
-#Label axes
-
-fontsize=fs
-
-ax1.set_ylabel(r'$\Delta_{\rm E}$ [hr]',fontsize=fs)
-ax2.set_ylabel(r'$|\delta \Delta_{\rm E}|$ [s]',fontsize=fs)
-ax2.set_xlabel(r'$\tau$ [yr]',fontsize=fs)
-
-ax2.set_ylim(1e-7)
+savepath = '/Users/tomkimpson/Dropbox/MSSL/Papers/Submitted/Paper3_A&A/figures/'
+plt.savefig(savepath+'RoemerDelay.png', dpi = 300,bbox='tight')
 
 plt.show()
-
-

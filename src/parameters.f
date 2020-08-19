@@ -11,9 +11,9 @@ real(kind=dp), parameter :: PI = 4.D0*ATAN(1.D0)
 
 !Orbital parameters
 
-real(kind=dp), parameter :: semi_major = 820.0_dp 
+real(kind=dp), parameter :: semi_major = 825.0_dp 
 real(kind=dp), parameter :: eccentricity = 0.70_dp !Orbital eccentricity
-real(kind=dp), parameter :: iota = 0.0_dp !Inclination w.r.t equatorial plane in degrees
+real(kind=dp), parameter :: iota = 20.0_dp !Inclination w.r.t equatorial plane in degrees
 real(kind=dp), parameter :: N_orbit = 5.50_dp !Number of orbits to integrate
 
 
